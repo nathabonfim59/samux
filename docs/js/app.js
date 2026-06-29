@@ -409,20 +409,26 @@ async function setupTerminal() {
     if (loader) loader.innerHTML = "Could not load the terminal engine (ghostty-web / WebAssembly). The config builder below still works.";
     return;
   }
-  term = new Terminal({
-    fontSize: 14,
-    fontFamily: "'JetBrains Mono','Fira Code','Cascadia Code',ui-monospace,Menlo,Consolas,monospace",
-    theme: { background: state.palette.bg, foreground: state.palette.fg, cursor: state.palette.accent },
-    cursorBlink: true,
-    cursorStyle: "bar",
-    disableStdin: false,
-    scrollback: 0,
-    allowTransparency: false,
-    convertEol: true,
-  });
-  fit = new FitAddon();
-  term.loadAddon(fit);
-  term.open(termArea);
+  try {
+    term = new Terminal({
+      fontSize: 14,
+      fontFamily: "'JetBrains Mono','Fira Code','Cascadia Code',ui-monospace,Menlo,Consolas,monospace",
+      theme: { background: state.palette.bg, foreground: state.palette.fg, cursor: state.palette.accent },
+      cursorBlink: true,
+      cursorStyle: "bar",
+      disableStdin: false,
+      scrollback: 0,
+      allowTransparency: false,
+      convertEol: true,
+    });
+    fit = new FitAddon();
+    term.loadAddon(fit);
+    term.open(termArea);
+  } catch (err) {
+    console.error("ghostty-web setup failed:", err);
+    if (loader) loader.innerHTML = "Could not start the terminal preview in this browser. The config builder below still works.";
+    return;
+  }
   try { fit.fit(); } catch (_) {}
   try { fit.observeResize(); } catch (_) {}
   term.onResize(() => render());
