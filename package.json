@@ -1,0 +1,13 @@
+{
+  "name": "samux",
+  "version": "1.0.0",
+  "description": "sane tmux configuration, with an interactive web config builder",
+  "private": true,
+  "type": "module",
+  "homepage": "https://nathabonfim59.github.io/samux/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nathabonfim59/samux.git"
+  },
+  "license": "MIT"
+}

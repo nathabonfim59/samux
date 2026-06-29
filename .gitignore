@@ -1,0 +1,14 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Node (only used for the local config generator helper, not a build step)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Local artifacts
+*.log

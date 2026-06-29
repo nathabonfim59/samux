@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>samux :: sane tmux configuration</title>
+  <meta name="description" content="samux is a sane tmux configuration builder. Pick colors, toggle features, preview it live in a real terminal, then download your .tmux.conf.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2322212C'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='20' fill='%23E57F6C' text-anchor='middle' font-weight='700'%3E$%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">$</div>
+      <div class="brand-text">
+        <h1>samux</h1>
+        <p class="tag">sane tmux configuration</p>
+      </div>
+    </div>
+    <nav class="topbar-actions">
+      <a class="toplink" href="https://github.com/nathabonfim59/samux" target="_blank" rel="noopener">GitHub</a>
+      <button id="btnReset" class="btn ghost">Reset default</button>
+      <button id="btnCopy" class="btn ghost">Copy</button>
+      <button id="btnDownload" class="btn primary">Download .tmux.conf</button>
+    </nav>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <section class="panel">
+        <div class="section-head">
+          <h2>Theme</h2>
+          <div class="preset-dropdown-wrap">
+            <button id="btnBrowse" class="btn small accent">Ready-made themes &#9662;</button>
+            <div id="presetDropdown" class="preset-dropdown">
+              <p class="dropdown-tip">Pick a starting point, then fine-tune the colors below.</p>
+              <div id="presetGrid" class="preset-grid"></div>
+            </div>
+          </div>
+        </div>
+        <div id="colorGrid" class="color-grid"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Features</h2>
+        <p class="section-hint">Toggle the sane defaults. The generated config updates live.</p>
+        <div id="featureList" class="feature-list"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Advanced</h2>
+        <label class="row">
+          <span class="row-label">Terminal type</span>
+          <select id="termSelect" class="select"></select>
+        </label>
+        <label class="row switch-row">
+          <span class="row-label">24-hour clock</span>
+          <span class="switch"><input id="clockToggle" type="checkbox"><span class="slider"></span></span>
+        </label>
+      </section>
+    </aside>
+
+    <section class="main">
+      <div class="preview-head">
+        <div class="preview-title">
+          <span class="live-dot"></span> Live preview
+          <span id="prefixHint" class="prefix-hint">prefix ready: press a key</span>
+        </div>
+        <div class="bar-controls">
+          <span class="ctl-label">Bar</span>
+          <button id="posTop" class="seg-btn">Top</button>
+          <button id="posBottom" class="seg-btn">Bottom</button>
+          <span class="ctl-divider"></span>
+          <label class="chip"><input type="checkbox" id="segSession"><span>session</span></label>
+          <label class="chip"><input type="checkbox" id="segUserhost"><span>user@host</span></label>
+          <label class="chip"><input type="checkbox" id="segGit"><span>git</span></label>
+          <label class="chip"><input type="checkbox" id="segBattery"><span>battery</span></label>
+          <label class="chip"><input type="checkbox" id="segDate"><span>date</span></label>
+          <label class="chip"><input type="checkbox" id="segClock"><span>clock</span></label>
+        </div>
+      </div>
+
+      <div id="termWrap" class="term-wrap">
+        <div id="termArea" class="term-area"></div>
+        <div id="termLoader" class="term-loader">Booting terminal&hellip;</div>
+      </div>
+      <p class="term-hint">
+        Click the terminal and type. Try <code>help</code>, <code>neofetch</code>,
+        <code>theme tokyo-night</code>, <code>split</code>. Shortcuts are live:
+        <code>Alt+1..9</code>, <code>Alt+h/l</code>, <code>Alt+j/k</code>, <code>Ctrl-b</code>.
+      </p>
+
+      <div class="config-section panel">
+        <div class="config-head">
+          <h2>Generated <code>tmux.conf</code></h2>
+          <div class="config-meta">
+            <span class="theme-tag" id="themeName"></span>
+            <button id="btnCopyCfg" class="btn small ghost">Copy</button>
+            <button id="btnDownloadCfg" class="btn small accent">Download tmux.conf</button>
+          </div>
+        </div>
+        <pre id="cfgOut" class="cfg-out"></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>samux by <a href="https://github.com/nathabonfim59" target="_blank" rel="noopener">nathabonfim59</a>.</span>
+    <span>Terminal rendering by <a href="https://github.com/coder/ghostty-web" target="_blank" rel="noopener">ghostty-web</a>.</span>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
