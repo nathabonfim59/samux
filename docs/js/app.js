@@ -25,6 +25,7 @@ function defaultState() {
     },
     term: "tmux-256color",
     clock24: true,
+    nerdfont: true,
   };
 }
 
@@ -65,7 +66,7 @@ function seedLogs() {
     logLine(t + "2", "INFO ", "cyan", "new session: samux"),
     logLine(t + "3", "WARN ", "yellow", "escape-time was 50ms, samux set it to 0"),
     logLine(t + "4", "INFO ", "cyan", "status bar painted with truecolor"),
-    logLine(t + "5", "ERROR", "red", "battery script not found (this is expected)"),
+    logLine(t + "5", "INFO ", "cyan", "battery segment is inlined, no external script"),
     logLine(t + "6", "INFO ", "cyan", "Alt+1..9 and Ctrl-b prefix are live here"),
   ];
 }
@@ -374,7 +375,8 @@ function onKey(e) {
   if (k === "Backspace") { pane.input = pane.input.slice(0, -1); e.preventDefault(); render(); return; }
   if (k === "ArrowUp") { historyUp(pane); e.preventDefault(); return; }
   if (k === "ArrowDown") { historyDown(pane); e.preventDefault(); return; }
-  if (k === "Tab") { pane.input += "    "; e.preventDefault(); render(); return; }
+  // Tab is intentionally NOT handled here, so it moves focus to the next
+  // control and the whole page stays keyboard navigable.
   if (k === "Escape") { pane.input = ""; e.preventDefault(); render(); return; }
 
   if (k.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
@@ -517,7 +519,7 @@ function buildPresetGrid() {
       .map((t) => `<span class="mtok" style="color:${t.fg};background:${t.bg};${t.bold ? "font-weight:700" : ""}">${esc(t.text)}</span>`)
       .join("");
     return `
-      <button class="preset-card" data-id="${p.id}">
+      <button class="preset-card" type="button" data-id="${p.id}">
         <div class="mini" style="background:${p.palette.bg}"><div class="mini-bar">${bar}</div></div>
         <div class="preset-name">${esc(p.name)}</div>
         <div class="preset-blurb">${esc(p.blurb)}</div>
@@ -575,6 +577,10 @@ function refreshUI() {
   document.getElementById("termSelect").value = state.term;
   // clock
   document.getElementById("clockToggle").checked = state.clock24;
+  // nerdfont
+  document.getElementById("nerdfontToggle").checked = state.nerdfont;
+  const nerdStep = document.getElementById("nerdStep");
+  if (nerdStep) nerdStep.hidden = !state.nerdfont;
   // position
   document.getElementById("posTop").classList.toggle("on", state.statusPosition === "top");
   document.getElementById("posBottom").classList.toggle("on", state.statusPosition === "bottom");
@@ -638,6 +644,11 @@ function wireControls() {
 
   document.getElementById("clockToggle").addEventListener("change", (e) => {
     state.clock24 = e.target.checked;
+    refreshUI();
+  });
+
+  document.getElementById("nerdfontToggle").addEventListener("change", (e) => {
+    state.nerdfont = e.target.checked;
     refreshUI();
   });
 

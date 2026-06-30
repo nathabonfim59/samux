@@ -23,7 +23,7 @@ The samux default is opinionated but portable:
 - Alt+1..9 to switch windows, Alt+h/l for previous/next, Alt+j/k to swap
 - Extended keys and passthrough for Claude Code compatibility
 - True color support
-- Wayland environment propagation (clipboard, battery)
+- Wayland environment propagation for clipboard
 - A truecolor status bar with session name, window tabs, git branch, battery,
   date, and clock
 - A bell and activity indicator
@@ -53,18 +53,32 @@ The whole page re-themes to match the palette you pick.
 ## Install the default config
 
 ```sh
-mkdir -p ~/.config/samux/scripts
 curl -fsSL https://raw.githubusercontent.com/nathabonfim59/samux/main/tmux.conf \
   -o ~/.tmux.conf
-curl -fsSL https://raw.githubusercontent.com/nathabonfim59/samux/main/scripts/battery.sh \
-  -o ~/.config/samux/scripts/battery.sh
-chmod +x ~/.config/samux/scripts/battery.sh
 tmux source-file ~/.tmux.conf   # or start a fresh server
 ```
 
-The status bar calls `~/.config/samux/scripts/battery.sh`. If you do not want a
-battery segment, uncheck it in the builder (or remove that part of
-`status-right`) and you can skip the script.
+The battery segment is inlined in the config (it reads `/sys/class/power_supply`
+directly), so there is no extra script to install. If you do not want it,
+uncheck "battery" in the builder.
+
+For the full look, including Nerd Font battery icons and the Starship prompt,
+see the "Make yours look like this" card on the site, or the next section.
+
+## Nerd Font and Starship
+
+The builder has a "Nerd Font icons" toggle in Advanced. When on, the battery
+segment uses Nerd Font glyphs for the charge level and the charging state. You
+need a Nerd Font installed in your terminal, or the icons show as empty boxes.
+The web preview keeps a plain percentage because it cannot render those glyphs.
+
+The shell prompt shown in the preview is [Starship](https://starship.rs).
+Install it and add the init line to your shell rc file:
+
+```sh
+curl -sS https://starship.rs/install.sh | sh
+eval "$(starship init zsh)"   # zsh; use `starship init bash` or fish
+```
 
 ## Keybindings (from the default config)
 
@@ -93,7 +107,6 @@ docs/                 the GitHub Pages site (no build step)
   js/app.js           state, keyboard handling, the fake shell, UI
   vendor/ghostty-web.js  the terminal renderer (vendored, WASM inlined)
 tmux.conf             the samux default config (matches the site default)
-scripts/battery.sh    battery segment helper for the status bar
 deploy-workflow.example.yml   optional GitHub Actions workflow for Pages
 ```
 

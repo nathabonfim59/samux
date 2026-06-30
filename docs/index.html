@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/styles.css">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2322212C'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='20' fill='%23E57F6C' text-anchor='middle' font-weight='700'%3E$%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2322212C'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='20' fill='%23E57F6C' text-anchor='middle' font-weight='700'%3E$%3C/text%3E%3C/svg%3E">
 </head>
 <body>
   <header class="topbar">
@@ -22,9 +22,9 @@
     </div>
     <nav class="topbar-actions">
       <a class="toplink" href="https://github.com/nathabonfim59/samux" target="_blank" rel="noopener">GitHub</a>
-      <button id="btnReset" class="btn ghost">Reset default</button>
-      <button id="btnCopy" class="btn ghost">Copy</button>
-      <button id="btnDownload" class="btn primary">Download .tmux.conf</button>
+      <button id="btnReset" type="button" class="btn ghost">Reset default</button>
+      <button id="btnCopy" type="button" class="btn ghost">Copy</button>
+      <button id="btnDownload" type="button" class="btn primary">Download .tmux.conf</button>
     </nav>
   </header>
 
@@ -34,7 +34,7 @@
         <div class="section-head">
           <h2>Theme</h2>
           <div class="preset-dropdown-wrap">
-            <button id="btnBrowse" class="btn small accent">Ready-made themes &#9662;</button>
+            <button id="btnBrowse" type="button" class="btn small accent">Ready-made themes &#9662;</button>
             <div id="presetDropdown" class="preset-dropdown">
               <p class="dropdown-tip">Pick a starting point, then fine-tune the colors below.</p>
               <div id="presetGrid" class="preset-grid"></div>
@@ -60,20 +60,35 @@
           <span class="row-label">24-hour clock</span>
           <span class="switch"><input id="clockToggle" type="checkbox"><span class="slider"></span></span>
         </label>
+        <label class="row switch-row">
+          <span class="row-label">
+            Nerd Font icons
+            <details class="popover">
+              <summary aria-label="About Nerd Font icons">i</summary>
+              <div class="popover-body">
+                Adds Nerd Font glyphs to the battery segment (charge level and
+                charging state). You must install a Nerd Font in your terminal,
+                otherwise the icons show as empty boxes. The web preview cannot
+                render these glyphs, so it keeps a plain percentage.
+              </div>
+            </details>
+          </span>
+          <span class="switch"><input id="nerdfontToggle" type="checkbox"><span class="slider"></span></span>
+        </label>
       </section>
     </aside>
 
     <section class="main">
       <div class="preview-head">
         <div class="preview-title">
-          <span class="live-dot"></span> Live preview
+          <span class="live-dot" aria-hidden="true"></span> Live preview
           <span id="prefixHint" class="prefix-hint">prefix ready: press a key</span>
         </div>
         <div class="bar-controls">
           <span class="ctl-label">Bar</span>
-          <button id="posTop" class="seg-btn">Top</button>
-          <button id="posBottom" class="seg-btn">Bottom</button>
-          <span class="ctl-divider"></span>
+          <button id="posTop" type="button" class="seg-btn">Top</button>
+          <button id="posBottom" type="button" class="seg-btn">Bottom</button>
+          <span class="ctl-divider" aria-hidden="true"></span>
           <label class="chip"><input type="checkbox" id="segSession"><span>session</span></label>
           <label class="chip"><input type="checkbox" id="segUserhost"><span>user@host</span></label>
           <label class="chip"><input type="checkbox" id="segGit"><span>git</span></label>
@@ -83,7 +98,7 @@
         </div>
       </div>
 
-      <div id="termWrap" class="term-wrap">
+      <div id="termWrap" class="term-wrap" role="application" aria-label="Pretend tmux terminal preview. Click it, then type. Tab moves focus away.">
         <div id="termArea" class="term-area"></div>
         <div id="termLoader" class="term-loader">Booting terminal&hellip;</div>
       </div>
@@ -98,12 +113,42 @@
           <h2>Generated <code>tmux.conf</code></h2>
           <div class="config-meta">
             <span class="theme-tag" id="themeName"></span>
-            <button id="btnCopyCfg" class="btn small ghost">Copy</button>
-            <button id="btnDownloadCfg" class="btn small accent">Download tmux.conf</button>
+            <button id="btnCopyCfg" type="button" class="btn small ghost">Copy</button>
+            <button id="btnDownloadCfg" type="button" class="btn small accent">Download tmux.conf</button>
           </div>
         </div>
         <pre id="cfgOut" class="cfg-out"></pre>
       </div>
+
+      <section class="panel install-card">
+        <h2>Make yours look like this</h2>
+        <ol class="steps">
+          <li>
+            <p><strong>Save the config</strong> to your home directory:</p>
+            <pre class="step-code">cp tmux.conf ~/.tmux.conf</pre>
+            <p class="muted">Or use the Download button above, then move the file.</p>
+          </li>
+          <li id="nerdStep">
+            <p><strong>Install a Nerd Font</strong> for the battery icons:</p>
+            <pre class="step-code"># choose one from https://www.nerdfonts.com/font-downloads
+# install it, then set it as your terminal font</pre>
+          </li>
+          <li>
+            <p><strong>Install Starship</strong> for the shell prompt:</p>
+            <pre class="step-code">curl -sS https://starship.rs/install.sh | sh</pre>
+            <p class="muted">Then add the init line to your shell rc file:</p>
+            <pre class="step-code"># zsh, in ~/.zshrc
+eval "$(starship init zsh)"
+
+# bash, in ~/.bashrc
+eval "$(starship init bash)"</pre>
+          </li>
+          <li>
+            <p><strong>Reload tmux</strong> (or start a fresh server):</p>
+            <pre class="step-code">tmux source-file ~/.tmux.conf</pre>
+          </li>
+        </ol>
+      </section>
     </section>
   </main>
 

@@ -1,14 +1,48 @@
 // config.js
 // Turns the editor state into a real ~/.tmux.conf string.
-// Colors are INLINED as #RRGGBB hex. We do not use $VAR references
-// because tmux does not expand shell-style variables inside format
-// strings, so $VAR would never color anything. Inlined hex works on
-// every tmux version.
+// Colors are INLINED as #RRGGBB hex (tmux does not expand $VAR in formats).
+// The battery segment is INLINED too: no external script.
+//
+// tmux #(...) matches the first closing paren, so the battery command is kept
+// paren-free: command substitution uses backticks, branching uses if/fi
+// (never `case ... )`), and awk programs use braces only.
 
 const ORDER = ["accent", "bg", "cur", "fg", "comment", "cyan", "green", "orange", "pink", "red", "yellow"];
 
+// Nerd Font glyphs (FontAwesome range), as JS unicode escapes so the source
+// stays ASCII. generateConfig emits the real codepoints into the config.
+const NF = {
+  bolt: "", // charging
+  plug: "", // plugged in, not charging
+  full: "",
+  q3: "",
+  half: "",
+  q1: "",
+};
+
 function block(title, lines) {
   return [`# --- ${title} ---`, ...lines, ""].join("\n");
+}
+
+// Inline battery command. Reads sysfs (no upower dependency).
+// Uses backticks (paren-free, so tmux #() matches the real close paren) and
+// echo (no single quotes), so the whole status-right can be single-quoted in
+// the config, which stops tmux from expanding the $p/$s/$i shell variables.
+function batteryCmd(state) {
+  const b = "`";
+  const cap = "cat /sys/class/power_supply/BAT0/capacity 2>/dev/null || cat /sys/class/power_supply/BAT1/capacity 2>/dev/null || echo 100";
+  const st = "cat /sys/class/power_supply/BAT0/status 2>/dev/null || cat /sys/class/power_supply/BAT1/status 2>/dev/null";
+  if (state.nerdfont) {
+    const segs = [
+      `p=${b}${cap}${b}`,
+      `s=${b}${st}${b}`,
+      `if [ $p -ge 75 ]; then i=${NF.full}; elif [ $p -ge 50 ]; then i=${NF.q3}; elif [ $p -ge 25 ]; then i=${NF.half}; else i=${NF.q1}; fi`,
+      `if [ $s = Charging ]; then echo ${NF.bolt} $i $p%; elif [ $s = Full ]; then echo ${NF.plug} $i $p%; else echo $i $p%; fi`,
+    ];
+    return "#(" + segs.join("; ") + ")";
+  }
+  // Plain percentage, no icons.
+  return "#(" + cap + ")%%";
 }
 
 export function generateConfig(state) {
@@ -22,15 +56,14 @@ export function generateConfig(state) {
   L.push("# https://nathabonfim59.github.io/samux/");
   L.push("#");
   L.push(`# Theme: ${state.themeName}`);
+  L.push(`# Nerd Font icons: ${state.nerdfont ? "on (install a Nerd Font for the battery glyphs)" : "off"}`);
   L.push("# Prefix is C-b. Reload after editing:  tmux source-file ~/.tmux.conf");
   L.push("");
 
-  // Palette reference (commented, for humans). Values are inlined below.
   L.push(`# --- Palette: ${state.themeName} ---`);
   for (const r of ORDER) L.push(`# ${r.padEnd(8)} ${P[r]}`);
   L.push("");
 
-  // Core sane defaults (always on).
   L.push(block("Core sane defaults", ["set -s escape-time 0"]));
 
   if (f.vim) L.push(block("VI copy mode", ["setw -g mode-keys vi"]));
@@ -107,9 +140,9 @@ export function generateConfig(state) {
     "set -g status-interval 5",
     `set -g status-position ${pos}`,
     "set -g status-left-length 40",
-    `set -g status-left "${statusLeft(state, P)}"`,
-    "set -g status-right-length 80",
-    `set -g status-right "${statusRight(state, P)}"`,
+    `set -g status-left '${statusLeft(state, P)}'`,
+    "set -g status-right-length 120",
+    `set -g status-right '${statusRight(state, P)}'`,
     `setw -g window-status-format "#[fg=${P.comment},bg=${P.bg}]  #I:#W#F  "`,
     `setw -g window-status-current-format "#[fg=${P.fg},bg=${P.cur},bold]  #I:#W  "`,
     'setw -g window-status-separator ""',
@@ -134,7 +167,7 @@ function statusLeft(state, P) {
 function statusRight(state, P) {
   const parts = [];
   if (state.right.git) parts.push(`#[fg=${P.pink}] git:#(git rev-parse --abbrev-ref HEAD 2>/dev/null) `);
-  if (state.right.battery) parts.push(`#[fg=${P.comment}]#(~/.config/samux/scripts/battery.sh) `);
+  if (state.right.battery) parts.push(`#[fg=${P.comment}]${batteryCmd(state)} `);
   if (state.right.date) parts.push(`#[fg=${P.comment}]%a %d %b `);
   if (state.right.clock) {
     const fmt = state.clock24 ? "%H:%M" : "%I:%M";
