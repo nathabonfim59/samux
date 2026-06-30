@@ -2,6 +2,18 @@
    Sharp corners, flat (no shadows, no gradients). Derived tones use
    color-mix so the page re-themes with the chosen palette. */
 
+/* Self-hosted subset of Symbols Nerd Font Mono: only the 6 battery glyphs
+   the config emits. Loaded so the live preview and the generated config
+   can show the real Nerd Font icons instead of empty boxes. It sits last
+   in every monospace stack as a per-glyph fallback. */
+@font-face {
+  font-family: "Symbols Nerd Font Mono";
+  src: url("../fonts/samux-nerd-symbols.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
 :root {
   --accent: #E57F6C;
   --bg: #22212C;
@@ -17,7 +29,8 @@
   --inset: color-mix(in srgb, var(--bg) 65%, #000);
   --border: color-mix(in srgb, var(--fg) 14%, transparent);
   --border-2: color-mix(in srgb, var(--fg) 24%, transparent);
-  --dim: color-mix(in srgb, var(--fg) 52%, var(--comment));
+  --dim: color-mix(in srgb, var(--fg) 60%, var(--comment));
+  --ease: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out-quint: house timing for state changes */
 }
 
 * { box-sizing: border-box; }
@@ -32,7 +45,7 @@ body {
 }
 
 a { color: var(--accent); }
-code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; }
+code, pre, .mono { font-family: "JetBrains Mono", "Symbols Nerd Font Mono", ui-monospace, Menlo, Consolas, monospace; }
 ::selection { background: color-mix(in srgb, var(--accent), transparent 55%); }
 
 /* Keyboard focus, always visible. */
@@ -43,7 +56,7 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
 }
 
 ::-webkit-scrollbar { width: 11px; height: 11px; }
-::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 8px; border: 3px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 5px; border: 3px solid transparent; background-clip: padding-box; }
 ::-webkit-scrollbar-thumb:hover { background: var(--comment); background-clip: padding-box; }
 
 /* --- Top bar ---------------------------------------------------------- */
@@ -64,9 +77,9 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
   font: 700 22px "JetBrains Mono", monospace;
 }
 .brand-text h1 { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
-.brand-text .tag { margin: 1px 0 0; font-size: 12.5px; color: var(--comment); }
+.brand-text .tag { margin: 1px 0 0; font-size: 12.5px; color: var(--dim); }
 .topbar-actions { display: flex; align-items: center; gap: 10px; }
-.toplink { font-size: 13.5px; color: var(--dim); text-decoration: none; padding: 8px 6px; }
+.toplink { font-size: 13.5px; color: var(--dim); text-decoration: none; padding: 8px 6px; transition: color .15s var(--ease); }
 .toplink:hover { color: var(--fg); }
 
 /* --- Layout ----------------------------------------------------------- */
@@ -84,11 +97,14 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
   border: 1px solid var(--border);
   border-radius: 5px; padding: 16px;
 }
-.section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 11px; margin-bottom: 13px; border-bottom: 1px solid var(--border); }
 .panel h2 {
-  margin: 0; font-size: 12.5px; font-weight: 600; letter-spacing: 0.07em;
-  text-transform: uppercase; color: var(--comment);
+  margin: 0; font: 500 12px/1.4 "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  letter-spacing: 0; text-transform: none; color: var(--fg);
 }
+/* Terminal-style section header: a commented label in mono, with a hairline rule beneath. */
+.panel h2::before { content: "# "; color: var(--comment); font-weight: 400; }
+.panel > h2 { padding-bottom: 10px; margin-bottom: 13px; border-bottom: 1px solid var(--border); }
 .section-hint { margin: 0 0 12px; font-size: 12.5px; color: var(--dim); }
 
 /* --- Buttons ---------------------------------------------------------- */
@@ -97,7 +113,7 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
   font: 500 13.5px "Inter", sans-serif; padding: 8px 14px;
   border-radius: 3px; border: 1px solid var(--border);
   background: var(--panel-2); color: var(--fg); cursor: pointer;
-  transition: border-color .15s, background .15s, filter .15s, transform .08s;
+  transition: border-color .15s var(--ease), background .15s var(--ease), filter .15s var(--ease), transform .08s var(--ease);
 }
 .btn:hover { border-color: color-mix(in srgb, var(--accent), transparent 35%); }
 .btn:active { transform: translateY(1px); }
@@ -111,7 +127,7 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
 /* --- Color grid ------------------------------------------------------- */
 
 .color-grid { display: flex; flex-direction: column; gap: 1px; }
-.color-row { display: flex; align-items: center; gap: 12px; padding: 6px 4px; border-radius: 3px; }
+.color-row { display: flex; align-items: center; gap: 12px; padding: 6px 4px; border-radius: 3px; transition: background .12s var(--ease); }
 .color-row:hover { background: var(--panel-2); }
 .swatch { flex: none; }
 .swatch input[type="color"] {
@@ -124,17 +140,33 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
 .color-meta { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .color-label { font-size: 13.5px; }
 .color-hint { font-size: 11.5px; color: var(--dim); }
-.color-hex { margin-left: auto; font-size: 12px; color: var(--comment); }
+.color-hex { margin-left: auto; font-size: 12px; color: var(--dim); }
 
 /* --- Feature list ----------------------------------------------------- */
 
 .feature-list { display: flex; flex-direction: column; gap: 3px; }
 .feature {
   display: flex; gap: 11px; align-items: flex-start;
-  padding: 9px 10px; border-radius: 3px; cursor: pointer; transition: background .12s;
+  padding: 9px 10px; border-radius: 3px; cursor: pointer; transition: background .12s var(--ease);
 }
 .feature:hover { background: var(--panel-2); }
-.feature input { width: 17px; height: 17px; margin-top: 1px; accent-color: var(--accent); cursor: pointer; flex: none; }
+.feature input {
+  appearance: none; -webkit-appearance: none;
+  width: 16px; height: 16px; flex: none; margin-top: 1px;
+  border: 1px solid var(--border-2); border-radius: 2px;
+  background: var(--inset); cursor: pointer;
+  display: grid; place-content: center;
+  transition: background .15s var(--ease), border-color .15s var(--ease);
+}
+.feature input::before {
+  content: ""; width: 4px; height: 8px;
+  border: solid var(--bg); border-width: 0 2px 2px 0;
+  transform: translateY(-1px) rotate(45deg) scale(0);
+  transition: transform .15s var(--ease);
+}
+.feature input:checked { background: var(--accent); border-color: var(--accent); }
+.feature input:checked::before { transform: translateY(-1px) rotate(45deg) scale(1); }
+.feature:hover input { border-color: color-mix(in srgb, var(--accent), transparent 40%); }
 .feature-text { display: flex; flex-direction: column; gap: 2px; }
 .feature-label { font-size: 13.5px; }
 .feature-desc { font-size: 11.5px; color: var(--dim); }
@@ -142,12 +174,15 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
 /* --- Rows, select, switch -------------------------------------------- */
 
 .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 2px; }
+.row + .row { margin-top: 6px; padding-top: 14px; border-top: 1px solid var(--border); }
 .row-label { font-size: 13.5px; display: inline-flex; align-items: center; gap: 2px; }
 .select {
   background: var(--inset); color: var(--fg);
   border: 1px solid var(--border); border-radius: 3px;
   padding: 7px 9px; font: 13px "Inter", sans-serif; cursor: pointer; max-width: 62%;
+  transition: border-color .15s var(--ease);
 }
+.select:hover { border-color: var(--border-2); }
 .select option { background: var(--inset); color: var(--fg); }
 .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex: none; }
 .switch input { opacity: 0; width: 0; height: 0; }
@@ -155,11 +190,11 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
 .slider {
   position: absolute; inset: 0; cursor: pointer;
   background: var(--panel-2); border: 1px solid var(--border);
-  border-radius: 3px; transition: .2s;
+  border-radius: 3px; transition: .2s var(--ease);
 }
 .slider::before {
   content: ""; position: absolute; height: 16px; width: 16px; left: 3px; top: 3px;
-  background: var(--comment); border-radius: 2px; transition: .2s;
+  background: var(--comment); border-radius: 2px; transition: .2s var(--ease);
 }
 .switch input:checked + .slider { background: color-mix(in srgb, var(--accent), transparent 62%); border-color: var(--accent); }
 .switch input:checked + .slider::before { transform: translateX(19px); background: var(--accent); }
@@ -170,7 +205,7 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
 .popover > summary {
   list-style: none; display: inline-grid; place-items: center;
   width: 16px; height: 16px; border: 1px solid var(--border-2); border-radius: 50%;
-  font-size: 10px; font-style: italic; font-family: "Times", serif; line-height: 1;
+  font-size: 10px; font-style: italic; font-family: "JetBrains Mono", ui-monospace, monospace; line-height: 1;
   color: var(--dim); cursor: help; margin-left: 5px;
 }
 .popover > summary::-webkit-details-marker { display: none; }
@@ -195,12 +230,11 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
 .preset-card {
   text-align: left; background: var(--panel); border: 1px solid var(--border);
   border-radius: 4px; padding: 9px; cursor: pointer;
-  display: flex; flex-direction: column; gap: 6px; transition: border-color .15s, transform .1s;
+  display: flex; flex-direction: column; gap: 6px; transition: border-color .15s var(--ease), transform .1s var(--ease);
   color: var(--fg);
 }
 .preset-card:hover { border-color: var(--accent); transform: translateY(-1px); }
 .preset-card.active { border-color: var(--accent); }
-.preset-card.active::after { content: ""; }
 .mini { height: 30px; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; display: flex; align-items: stretch; }
 .mini-bar { font: 500 11px/30px "JetBrains Mono", monospace; white-space: nowrap; display: flex; }
 .mtok { display: inline-block; height: 30px; }
@@ -218,25 +252,29 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 .prefix-hint {
   font-size: 11.5px; padding: 2px 9px; border-radius: 3px;
-  border: 1px solid var(--border); color: var(--dim); opacity: 0; transition: .15s; margin-left: 4px;
+  border: 1px solid var(--border); color: var(--dim); opacity: 0; transition: .15s var(--ease); margin-left: 4px;
 }
 .prefix-hint.armed {
   opacity: 1; color: var(--accent); border-color: var(--accent);
   background: color-mix(in srgb, var(--accent), transparent 86%);
 }
 .bar-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.ctl-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--dim); margin-right: 2px; }
+.ctl-group { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ctl-label { font-size: 11px; color: var(--dim); margin-right: 2px; }
 .seg-btn {
   padding: 5px 12px; border-radius: 3px; border: 1px solid var(--border);
   background: var(--panel-2); color: var(--fg); font: 500 12.5px "Inter", sans-serif; cursor: pointer;
+  transition: border-color .15s var(--ease), background .15s var(--ease);
 }
+.seg-btn:not(.on):hover { border-color: color-mix(in srgb, var(--accent), transparent 35%); }
 .seg-btn.on { background: var(--accent); color: var(--bg); border-color: transparent; font-weight: 600; }
 .ctl-divider { width: 1px; height: 18px; background: var(--border); margin: 0 5px; }
 .chip {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 5px 11px; border-radius: 3px; border: 1px solid var(--border);
-  font-size: 12px; color: var(--dim); cursor: pointer; user-select: none; transition: .12s;
+  font-size: 12px; color: var(--dim); cursor: pointer; user-select: none; transition: .12s var(--ease);
 }
+.chip:not(:has(input:checked)):hover { background: var(--panel-2); border-color: var(--border-2); }
 .chip input { accent-color: var(--accent); width: 13px; height: 13px; margin: 0; }
 .chip:has(input:checked) {
   color: var(--accent); border-color: color-mix(in srgb, var(--accent), transparent 40%);
@@ -253,25 +291,25 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
 .term-area canvas { display: block; }
 .term-loader {
   position: absolute; inset: 0; display: grid; place-items: center;
-  color: var(--comment); font-size: 13px; background: var(--bg); border-radius: 5px;
+  color: var(--dim); font-size: 13px; background: var(--bg); border-radius: 5px;
 }
 .term-hint { font-size: 12.5px; color: var(--dim); margin: 11px 3px 20px; }
-.term-hint code, .config-head code {
-  font-size: .92em; background: var(--panel-2); color: var(--accent);
-  padding: 1px 6px; border-radius: 3px;
+.term-hint code {
+  font-size: .92em; color: var(--fg);
+  background: var(--panel-2); padding: 1px 6px; border-radius: 3px;
 }
 
 /* --- Config output ---------------------------------------------------- */
 
 .config-section { margin-top: 4px; }
-.config-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px; flex-wrap: wrap; }
+.config-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 11px; margin-bottom: 13px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
 .config-head h2 { margin: 0; }
-.config-head code { text-transform: none; letter-spacing: 0; color: var(--fg); background: none; padding: 0; }
+.config-head code { font-size: .92em; text-transform: none; letter-spacing: 0; color: var(--fg); background: none; padding: 0; }
 .config-meta { display: flex; align-items: center; gap: 8px; }
 .theme-tag {
   font-size: 12px; padding: 3px 10px; border-radius: 3px;
   background: color-mix(in srgb, var(--accent), transparent 86%);
-  color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent), transparent 62%);
+  color: var(--fg); border: 1px solid color-mix(in srgb, var(--accent), transparent 62%);
 }
 .cfg-out {
   margin: 0; background: var(--inset); color: var(--fg);
@@ -304,7 +342,7 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
   position: fixed; bottom: 26px; left: 50%;
   transform: translateX(-50%) translateY(22px);
   background: var(--accent); color: var(--bg); padding: 10px 20px; border-radius: 3px;
-  font: 600 13px "Inter", sans-serif; opacity: 0; pointer-events: none; transition: .25s; z-index: 100;
+  font: 600 13px "Inter", sans-serif; opacity: 0; pointer-events: none; transition: .25s var(--ease); z-index: 100;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -319,4 +357,18 @@ code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas,
   .topbar { flex-wrap: wrap; }
   .topbar-actions { width: 100%; justify-content: flex-end; }
   .preset-grid { grid-template-columns: 1fr; }
+}
+
+/* --- Reduced motion --------------------------------------------------- */
+/* The live dot is the only keyframe animation; everything else is short
+   state feedback. Under reduced-motion, freeze the blink and make state
+   changes effectively instant. */
+@media (prefers-reduced-motion: reduce) {
+  .live-dot { animation: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

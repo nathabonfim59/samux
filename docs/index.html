@@ -66,10 +66,11 @@
             <details class="popover">
               <summary aria-label="About Nerd Font icons">i</summary>
               <div class="popover-body">
-                Adds Nerd Font glyphs to the battery segment (charge level and
-                charging state). You must install a Nerd Font in your terminal,
-                otherwise the icons show as empty boxes. The web preview cannot
-                render these glyphs, so it keeps a plain percentage.
+                Adds Nerd Font glyphs to the status bar: a branch icon for git,
+                and level and charging icons for the battery. You must install a
+                Nerd Font in your terminal, otherwise the icons show as empty
+                boxes. This page ships a small Nerd Font subset, so the preview
+                shows them too.
               </div>
             </details>
           </span>
@@ -85,16 +86,21 @@
           <span id="prefixHint" class="prefix-hint">prefix ready: press a key</span>
         </div>
         <div class="bar-controls">
-          <span class="ctl-label">Bar</span>
-          <button id="posTop" type="button" class="seg-btn">Top</button>
-          <button id="posBottom" type="button" class="seg-btn">Bottom</button>
+          <span class="ctl-group" role="group" aria-label="Status bar position">
+            <span class="ctl-label">Position</span>
+            <button id="posTop" type="button" class="seg-btn">Top</button>
+            <button id="posBottom" type="button" class="seg-btn">Bottom</button>
+          </span>
           <span class="ctl-divider" aria-hidden="true"></span>
-          <label class="chip"><input type="checkbox" id="segSession"><span>session</span></label>
-          <label class="chip"><input type="checkbox" id="segUserhost"><span>user@host</span></label>
-          <label class="chip"><input type="checkbox" id="segGit"><span>git</span></label>
-          <label class="chip"><input type="checkbox" id="segBattery"><span>battery</span></label>
-          <label class="chip"><input type="checkbox" id="segDate"><span>date</span></label>
-          <label class="chip"><input type="checkbox" id="segClock"><span>clock</span></label>
+          <span class="ctl-group" role="group" aria-label="Status bar segments">
+            <span class="ctl-label">Segments</span>
+            <label class="chip"><input type="checkbox" id="segSession"><span>session</span></label>
+            <label class="chip"><input type="checkbox" id="segUserhost"><span>user@host</span></label>
+            <label class="chip"><input type="checkbox" id="segGit"><span>git</span></label>
+            <label class="chip"><input type="checkbox" id="segBattery"><span>battery</span></label>
+            <label class="chip"><input type="checkbox" id="segDate"><span>date</span></label>
+            <label class="chip"><input type="checkbox" id="segClock"><span>clock</span></label>
+          </span>
         </div>
       </div>
 
@@ -129,7 +135,7 @@
             <p class="muted">Or use the Download button above, then move the file.</p>
           </li>
           <li id="nerdStep">
-            <p><strong>Install a Nerd Font</strong> for the battery icons:</p>
+            <p><strong>Install a Nerd Font</strong> for the status bar icons:</p>
             <pre class="step-code"># choose one from https://www.nerdfonts.com/font-downloads
 # install it, then set it as your terminal font</pre>
           </li>

@@ -414,7 +414,7 @@ async function setupTerminal() {
   try {
     term = new Terminal({
       fontSize: 14,
-      fontFamily: "'JetBrains Mono','Fira Code','Cascadia Code',ui-monospace,Menlo,Consolas,monospace",
+      fontFamily: "'JetBrains Mono','Fira Code','Cascadia Code','Symbols Nerd Font Mono',ui-monospace,Menlo,Consolas,monospace",
       theme: { background: state.palette.bg, foreground: state.palette.fg, cursor: state.palette.accent },
       cursorBlink: true,
       cursorStyle: "bar",
@@ -440,6 +440,9 @@ async function setupTerminal() {
   if (loader) loader.remove();
   try { term.focus(); } catch (_) {}
   render();
+  // The Nerd Font subset can land just after the first paint; repaint once
+  // fonts are ready so battery glyphs don't briefly flash as empty boxes.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
 }
 
 // --- UI helpers ----------------------------------------------------------
@@ -472,7 +475,7 @@ function buildColorGrid() {
   grid.innerHTML = PALETTE_ROLES.map((r) => `
     <div class="color-row" data-role="${r.key}">
       <label class="swatch" title="${esc(r.hint)}">
-        <input type="color" data-role="${r.key}" value="${state.palette[r.key]}">
+        <input type="color" data-role="${r.key}" value="${state.palette[r.key]}" aria-label="${esc(r.label)}">
       </label>
       <div class="color-meta">
         <div class="color-label">${esc(r.label)}</div>
@@ -582,8 +585,13 @@ function refreshUI() {
   const nerdStep = document.getElementById("nerdStep");
   if (nerdStep) nerdStep.hidden = !state.nerdfont;
   // position
-  document.getElementById("posTop").classList.toggle("on", state.statusPosition === "top");
-  document.getElementById("posBottom").classList.toggle("on", state.statusPosition === "bottom");
+  const posTop = document.getElementById("posTop");
+  const posBottom = document.getElementById("posBottom");
+  const barAtTop = state.statusPosition === "top";
+  posTop.classList.toggle("on", barAtTop);
+  posTop.setAttribute("aria-pressed", String(barAtTop));
+  posBottom.classList.toggle("on", !barAtTop);
+  posBottom.setAttribute("aria-pressed", String(!barAtTop));
   // segments
   document.getElementById("segSession").checked = state.left.session;
   document.getElementById("segUserhost").checked = state.left.userhost;

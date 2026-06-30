@@ -9,15 +9,17 @@
 
 const ORDER = ["accent", "bg", "cur", "fg", "comment", "cyan", "green", "orange", "pink", "red", "yellow"];
 
-// Nerd Font glyphs (FontAwesome range), as JS unicode escapes so the source
-// stays ASCII. generateConfig emits the real codepoints into the config.
-const NF = {
-  bolt: "", // charging
-  plug: "", // plugged in, not charging
-  full: "",
-  q3: "",
-  half: "",
-  q1: "",
+// Nerd Font glyphs (FontAwesome + Devicons ranges), as JS unicode escapes so
+// the source stays ASCII. generateConfig emits the real codepoints into the
+// config, and render.js paints the same glyphs in the live preview.
+export const NF = {
+  bolt: "\uf0e7", // charging
+  plug: "\uf1e6", // plugged in, not charging
+  full: "\uf240",
+  q3: "\uf241",
+  half: "\uf242",
+  q1: "\uf243",
+  branch: "\ue725", // git branch (nf-dev-git_branch)
 };
 
 function block(title, lines) {
@@ -56,7 +58,7 @@ export function generateConfig(state) {
   L.push("# https://nathabonfim59.github.io/samux/");
   L.push("#");
   L.push(`# Theme: ${state.themeName}`);
-  L.push(`# Nerd Font icons: ${state.nerdfont ? "on (install a Nerd Font for the battery glyphs)" : "off"}`);
+  L.push(`# Nerd Font icons: ${state.nerdfont ? "on (install a Nerd Font for the status bar glyphs)" : "off"}`);
   L.push("# Prefix is C-b. Reload after editing:  tmux source-file ~/.tmux.conf");
   L.push("");
 
@@ -166,7 +168,10 @@ function statusLeft(state, P) {
 
 function statusRight(state, P) {
   const parts = [];
-  if (state.right.git) parts.push(`#[fg=${P.pink}] git:#(git rev-parse --abbrev-ref HEAD 2>/dev/null) `);
+  if (state.right.git) {
+    const gitLabel = state.nerdfont ? `${NF.branch} ` : "git:";
+    parts.push(`#[fg=${P.pink}] ${gitLabel}#(git rev-parse --abbrev-ref HEAD 2>/dev/null) `);
+  }
   if (state.right.battery) parts.push(`#[fg=${P.comment}]${batteryCmd(state)} `);
   if (state.right.date) parts.push(`#[fg=${P.comment}]%a %d %b `);
   if (state.right.clock) {

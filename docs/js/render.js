@@ -1,5 +1,8 @@
 // render.js
 // Paints the pretend tmux session into a ghostty-web Terminal.
+// Same glyph map as the generated config, so the preview shows the real icons.
+import { NF } from "./config.js";
+
 // We build a grid of cells, each with a char and truecolor fg/bg, then
 // serialize it to ANSI and write it. No PTY, no backend: the scene model
 // lives in app.js and we just visualize it here.
@@ -124,8 +127,18 @@ function drawStatusBar(g, cols, rows, model, state, P) {
   });
 
   const right = [];
-  if (state.right.git) right.push({ text: " git:main ", fg: P.pink, bg: P.bg });
-  if (state.right.battery) right.push({ text: " 75% ", fg: batteryColor(75, P), bg: P.bg });
+  if (state.right.git) {
+    const gitBody = state.nerdfont ? `${NF.branch} main` : "git:main";
+    right.push({ text: ` ${gitBody} `, fg: P.pink, bg: P.bg });
+  }
+  if (state.right.battery) {
+    // Static 75% snapshot. With Nerd Font on, prefix the charge-level glyph
+    // the config would emit at this level (>= 75 -> full), matching what the
+    // real status bar renders once a Nerd Font is installed.
+    const pct = 75;
+    const body = state.nerdfont ? `${NF.full} ${pct}%` : `${pct}%`;
+    right.push({ text: ` ${body} `, fg: batteryColor(pct, P), bg: P.bg });
+  }
   if (state.right.date) right.push({ text: ` ${dateStr()} `, fg: P.comment, bg: P.bg });
   if (state.right.clock) right.push({ text: ` ${timeStr(state.clock24)} `, fg: P.bg, bg: P.accent, bold: true });
 
